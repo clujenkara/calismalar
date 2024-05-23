@@ -1,0 +1,96 @@
+
+using System;
+
+using System.Drawing;
+
+using System.Windows.Forms;
+
+public class StylishCalculatorForm: Form
+
+{
+private TextBox input1;
+
+private TextBox input2;
+private Button addButton;
+private Button subtractButton;
+
+private Button multiplyButton;
+
+private Button divideButton;
+
+private Label resultLabel;
+private PictureBox logoPictureBox; // Logo için PictureBox
+
+private Label signatureLabel;
+
+public StylishCalculatorForm()
+
+{
+
+InitializeComponent();
+
+}
+
+private void InitializeComponent()
+{
+
+// Formun başlık ve arkaplan ayarları
+this.Text = "Stylish Calculator";
+this.BackColor = Color.WhiteSmoke;
+this.Size = new Size(400, 250);
+this. Font = new Font("Segoe UI", 9);
+this.StartPosition = FormStartPosition.CenterScreen;
+// Giriş TextBox'ları
+inputl= new TextBox() { Location = new Point(30, 30), Size = new Size(100, 25), Text = "0" };
+input2 = new TextBox() { Location = new Point(160, 30), Size = new Size(100, 25), Text = "0" };
+// Hesaplama Button'ları
+addButton = CreateButton("Topla", new Point(30, 70), AddButton_Click);
+subtractButton = CreateButton("Çıkar", new Point(160, 70), SubtractButton_Click);
+multiplyButton = CreateButton("Çarp", new Point(30, 110), MultiplyButton_Click);
+divideButton CreateButton("Böl", new Point(160, 110), DivideButton_Click);
+// Sonuç Label'a
+resultLabel = new Label() { Location new Point(30, 150), AutoSize true, Text "Sonuç:};
+// Logo PictureBox
+LogoPictureBox= new PictureBox() { Location new Point(300, 30) , Size new Size(64, 64), Image Image. FromFile(@"C:\Users\ageto\Desktop\iste_arma (1).png"), Sizellode PictureBoxSizeMode. StretchInage);
+// Inza Label'1
+signatureLabel = new Label() { Text = "Lujen Kara", AutoSize true, ForeColor = Color. DinGray, Font new Font("Segoe UI", 7, FontStyle. Italic), Dock DockStyle.Botton, TextAlign ContentAlignment.MiddleRight);
+// Kontrolleri forna ekleyin
+this.Controls.Add(input1);
+this.Controls.Add(input2);
+this.Controls.Add(addButton);
+this.Controls.Add(subtractButton);
+this.Controls.Add(multiplyButton);
+this.Controls.Add(divideButton); this.Controls.Add(resultLabel);
+this.Controls.Add(logoPictureBox);
+this.Controls.Add(signatureLabel);
+private Button CreateButton(string text, Point location, EventHandler clickEvent)
+var button new Button();
+button. Text= text;
+button.Location= location: 
+button. Size = new Size(100, 38)
+button.Click =clickEvent; // Burada düzeltme yapıldı
+return button;
+// Buton olay işleyicileri
+private void AddButton_Click(object sender, EventArgs e) => Calculate((a, b) => a+b);
+private void SubtractButton Click(object sender, EventArgs e) => Calculate((a, b) => ab);
+private void MultiplyButton_Click(object sender, EventArgs e) => Calculate((a, b) => ab);
+private void DivideButton_Click(object sender, EventArgs e) => Calculate((a, b) => a/b);
+private void Calculate (Func<double, double, double >operation)
+{
+if (double. TryParse(input1.Text, out double numi) && double. TryParse(input2. Text, out double num2))
+{
+double result operation(num1, num2);
+resultLabel.Text = "Sonuç: "+result.ToString();
+}
+else
+{
+}
+MessageBox.Show("Lütfen geçerli sayılar giriniz.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+[STAThread]
+static void Main()
+{
+Application.EnableVisualStyles();
+Application.SetCompatibleTextRenderingDefault(false);
+Application.Run(new StylishCalculatorForm ());
+}
+}
