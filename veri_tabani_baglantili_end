@@ -1,0 +1,158 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+// veritabanı bağlantılı ve kullanıcı arayuzune sahip bir hesap makinesi sınıfı tanımlıyoruz.
+public class VeriTabaniHesapMakinesi : Form
+  {
+    private TextBox input1, input2;
+    private Button toplaButton, cikarButton, carpButton, bolButton;Ü
+    private Label sonucLabel, statusLabel, signatureLabel;
+    private PictureBox logoPictureBox,
+    private MySqlConnection veritabaniBaglantisi;
+
+    public VeriTabaniHesapMakinesi()
+    {
+      InitializeComponent();
+      VeritabaniBaglantisikur();
+    }
+    private void InitializeComponent()
+    {
+      //Formun genel ayarlarını yapıyrouz
+      this.Text = " Veri Tabnı Baglantılı Hesap Makinesi",
+      this.BackColor = Color.WhiteSmoke;
+      this.Size = new Size(320,240);
+      this.StartPosition = FormStartPosition.CenterScreen;
+
+      //Griş kutularını oluştruruyoruz
+      input1 = new TextBox {Location = new Point(10,10) , Text = "0" };
+      input2 = new TextBox {Location = new Point(170,10) , Text = "0" };
+
+      // İşlem butonlarını oluştruyoruz
+      toplaButton = new Button {Text = "Topla" , Location = new Point(10,40)};
+      cikarButton = new Button {Text = "Cikar" , Location = new Point(170,40)};
+      carpButton = new Button {Text = "Carp" , Location = new Point(10,70)};
+      bolButton = new Button {Text = "Bol" , Location ) = new point(170,70)};
+
+      //Butonların olay işleyicilerini( event handlers ) atıyoruz
+      topla.ButtonClick += (sender , e) => Hesapla ((x,y) => x+y );
+      cikarButtonClick += (sender , e) => Hesapla ((x,y) => x-y );
+      carpButtonClick += (sender , e ) => Hesapla ((x,y) => x * y );Ü
+      bolButtonClick += (sender , e ) => Hesapla ((x,y) => x / y );
+
+      //Sonuc etiketini oluştruyoruz
+      sonucLabel = new Label {Text = "Sonuç: 0 ", Location = new Point(10,140) , AutoSize = true} ;
+      // Veri tabanı bağlantı etiketini oluştruyoruz
+      statusLabel = new Label {Location = new Point(10,100) , Size = new Size (300,20) };
+      // imza eetiketini oluşturuyoruz
+      signature Label = new Label
+     {
+      Text = "Lujen Kara" ,
+      Auto Size = true ,
+      ForeColor = Color = DinGray,
+      Font = new Font ("Segoe UI" , 7 , FontStyle.Italic),
+      Location = new Point(10,180)
+};
+//Logo içi picturebox oluştruyoruz
+logoPictureBox = new PictureBox
+{
+Image = Image.FromFile(@"C:\Users\ageto\Desktop\iste_arma (1) .png") , \\Logo yolu
+SizeMode = PictureBoxSizeMode.StretchImage,
+Location = new Point(250,180),
+Size = new Size(50,50)
+};
+//Oluştrudugumuz kontrollerı forma ekliyrouz
+this.Controls.Add(input1);
+this.Controls.Add(input2);
+this.Controls.Add(toplaButton);
+this.Controls.Add(cikarButton);
+this.Controls.Add(carpButton);
+this.Controls.Add(bolButton);
+this.Controls.Add(sonucLabel);
+this.Controls.Add(statusLabel);
+this.Controls.Add(signatureLabel);
+this.Controls.Add(logoPictureBox);
+
+
+private void VeriTabaniBaglantisiKur()
+{
+//mysql veritabanı bağlantı dizesini oluştruyoruz
+
+string baglantiDizesi = "server = localhost;port=3306; database = results;user = root; password=;";
+veritabaniBaglantisi = new MySqlConnection(baglantiDizesi);
+
+//Veritabani baglantisini acıyrouz ve durumu kontrol ediyoruz
+
+try
+{
+veritabaniBaglantisi.Open();
+statusLabel.Text = "veritabanı bağlantı durumu : bağlı";
+}
+catch (MySqlException ex)
+{
+statusLabel.Text = "Vertabanı baglanti hatası:" + ex.Message;
+}
+
+private void Hesapla(Func<double, double, double>islem)
+{
+try
+{
+//   Griş kutularından sayıları alıyoruz
+double sayi1 = double.Parse(input1.Text);
+double sayi2 = double.Parse(input2.Text);
+
+//Verilen işemi kullanarak hesaplama yapıyoruz
+
+double sonuc = islem(sayi1 , sayi2);
+
+//sonucu etikette gösteriyrouz
+sonucLabel.Text = "sonuc: " + sonuc;
+
+//sonucu veritabanına kaydediyoruz
+string sorgu = "INSERT INTO results (num1, num2, result) VALUES (@num1, @num2, @result) ";
+using (MySqlCommand komut = new MySqlCommand (sorgu , veritabaniBaglantisi))
+{
+//pARAMETREleri ekliyrouz
+komut.Parameters.AddWithValue("@num1" , sayi1);
+komut.Parameters.AddWithValue( "@num2" , sayi2);
+komut.Parameters.AddWithValue( "@result" , sonuc);
+
+//sql komutrunu çalıştrıyrouz
+komut.ExecuteNonQuery();
+}
+}
+catch (FormatException)
+{
+MessageBox.Show("lutfen gecerli sayiler griniz." , "Hata", MessageBoxButtons.OK, MessageBocIcon.Error);
+}
+catch (MySqlException ex)
+{
+MessageBox.Show("Veritabani işlem hatasi : " + ex.Message , "Hata" MessageBoxButtons.OK , MessageBoxIcon.Error);
+}
+}
+protected override void OnFormClosed(FormClosedEventsArgs e)
+{
+   // Form kapandığında veritabanı baglantısını guvenli bir şekilde kapatıyrouz
+if(veritabaniBaglantisi.State == System.Data.ConnectionState.Open)
+{
+veritabaniBaglantisi.Close();
+}
+base.OnFormClosed(e);
+}
+[STAThread]
+static void Main()
+{
+AppLication.EnableVisualStyles();
+AppLication.SetCompatibleTextRenderingDefault(false);
+AppLication.Run(new VeritabaniHesapMakinesi());
+}
+}
+
+
+
+      
+
+      
+
+      
+      
